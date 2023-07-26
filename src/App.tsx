@@ -8,7 +8,7 @@ import { useFuel } from "./components/usefuel";
 import {NftAbi__factory} from "./contracts/factories/NftAbi__factory";
 
 const CONTRACT_ID =
-  "0x4f751a218d461104a48234943e17c80a473ef69f7ce916067fe29cdec0b4d817";
+  "0x2b77e47ac98d71a04e548e9a4b9790d0e7f8f9d535935bf0151d7a3b075b0749";
 
 function App() {
   const [contract, setContract] = useState<Contract>();

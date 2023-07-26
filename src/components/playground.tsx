@@ -13,45 +13,27 @@ interface IPlayground {
 function Playground(props: IPlayground) {
     const [account, setAccount] = useState<string>("");
     const [account1, setAccount1] = useState<string>("");
-
-    const [owner, setOwner] = useState<IdentityOutput>();
+    const [approved, setApproved] = useState<boolean>(false);   
     const [tokenId, setTokenId] = useState<number>();
-    const [loading, setLoading] = useState<boolean>(false);
-    const [balance, setBalance] = useState<number>();
-    const [addr, setAddress] = useState<string>();
 
-    async function mint() {
-        if (window.fuel) {
-            if (account) {
-                setLoading(true);
-                const address = convertToAddress(account); 
-                const id: IdentityInput = identifyString(address);
-                try {
-                    await props.contract.functions
-                        .mint(id)
-                        .txParams({ gasPrice: 1 })
-                        .call();
-                } catch (err) {
-                    console.log("error sending transaction...", err);
-                }
-                setLoading(false);
-            }
-        }
-    }
+    const [approvalIdLog, setApprovalIdLog] = useState<IdentityOutput>();
+    const [ownerIdLog, setOwnerIdLog] = useState<IdentityOutput>();
+    const [balanceLog, setBalanceLog] = useState<number>();
+    const [addressLog, setAddressLog] = useState<string>();
+    const [approvalAllLog, setApprovalAllLog] = useState<string>();
 
+    // Read method
     async function tokenOf() {
         if (window.fuel) {
             if (tokenId) {
-                setLoading(true);
                 try {
                     const { value } = await props.contract.functions
                         .owner_of(new BN(tokenId))
                         .get();
-                    setOwner(value);
+                    setOwnerIdLog(value);
                 } catch (err) {
                     console.log("error sending transaction...", err);
-                }
-                setLoading(false);
+                };
             }
         }
     }
@@ -59,18 +41,70 @@ function Playground(props: IPlayground) {
     async function balanceOf() {
         if (window.fuel) {
             if (account) {
-                setLoading(true);
                 const address = convertToAddress(account); 
                 const id: IdentityInput = identifyString(address);
                 try {
                     const { value } = await props.contract.functions
                         .balance_of(id)
                         .get()
-                    setBalance(value.toNumber());
+                    setBalanceLog(value.toNumber());
                 } catch (err) {
                     console.log("error sending transaction...", err);
-                }
-                setLoading(false);
+                };
+            }
+        }
+    }
+
+    async function approvals() {
+        if (window.fuel) {
+            if (tokenId) {
+                try {
+                    const { value } = await props.contract.functions
+                        .approvals(new BN(tokenId))
+                        .get()
+                setApprovalIdLog(value);
+                } catch (err) {
+                    console.log("error sending transaction...", err);
+                };
+            }
+        }
+    }
+
+    async function isApprovalForAll() {
+        if (window.fuel) {
+            if (account && account1) {
+                const acc1 = convertToAddress(account);
+                const acc2 = convertToAddress(account1);
+                const id1: IdentityInput = identifyString(acc1);
+                const id2: IdentityInput = identifyString(acc2);
+                try {
+                    const { value } = await props.contract.functions
+                        .is_approved_for_all(id1, id2)
+                        .get()
+                    setApprovalAllLog(value? "true" : "false");
+                } catch (err) {
+                    console.log("error sending transaction...", err);
+                };
+            }
+        }
+    }
+
+
+    // Write method
+    async function mint() {
+        if (window.fuel) {
+            if (account) {
+                const address = convertToAddress(account); 
+                const id: IdentityInput = identifyString(address);
+                try {
+                    await props.contract.functions
+                        .mint(id)
+                        .txParams({ gasPrice: 1 })
+                        .call();
+                    alert(`Mint NFT to ${address} success!`)
+                } catch (err) {
+                    console.log("error sending transaction...", err);
+                };
             }
         }
     }
@@ -78,26 +112,61 @@ function Playground(props: IPlayground) {
     async function transfer() {
         if (window.fuel) {
             if (account && account1) {
-                setLoading(true);
                 const acc1 = convertToAddress(account);
                 const acc2 = convertToAddress(account1);
-
                 const id1: IdentityInput = identifyString(acc1);
                 const id2: IdentityInput = identifyString(acc2);
-
                 try {
                     await props.contract.functions
                         .transfer_from(id1, id2, new BN(tokenId))
                         .txParams({ gasPrice: 1 })
                         .call();
+                    alert(`Transfer tokenId ${tokenId} to ${acc2} success!`)
                 } catch (err) {
                     console.log("error sending transaction...", err);
-                }
-                setLoading(false);
+                };
             }
         }
     }
 
+    async function setApprovalForAll() {
+        if (window.fuel) {
+            if (account && approved) {
+                const address = convertToAddress(account);
+                const id: IdentityInput = identifyString(address);
+                try {
+                    await props.contract.functions
+                        .set_approval_for_all(id, approved)
+                        .txParams({ gasPrice: 1 })
+                        .call();
+                    alert(`${approved ? "Set approval" : "Cancel approval"} to ${address} for all success!`)
+                } catch (err) {
+                    console.log("error sending transaction...", err);
+                };
+            }
+        }
+    }
+
+    async function approve() {
+        if (window.fuel) {
+            if (account && tokenId) {
+                const address = convertToAddress(account);
+                const id: IdentityInput = identifyString(address);
+                try {
+                    await props.contract.functions
+                        .approve(id, new BN(tokenId))
+                        .txParams({ gasPrice: 1 })
+                        .call();
+                    alert(`Approve tokenId ${tokenId} to ${address} success!`)
+                } catch (err) {
+                    console.log("error sending transaction...", err);
+                };
+            }
+        }
+    }
+
+
+    // utils methods
     function convertToAddress(account: string) {
         const toAddress = Address.fromString(account);
         return toAddress.toHexString();
@@ -112,41 +181,85 @@ function Playground(props: IPlayground) {
     return (
         <div className="playground">
             <div>
-                <h2>Convert to address</h2>
-                <input type="text" placeholder="account (string)" onChange={(e) => { setAddress(convertToAddress(e.target.value)) } } required/>
-                <input type="text" placeholder="converted (address)" value={addr ? addr : ""} disabled/>
+                <h3>Convert to address</h3>
+                <input type="text" placeholder="account (string)" onChange={(e) => { setAddressLog(convertToAddress(e.target.value)) } } required/>
+                <input type="text" placeholder="converted (address)" value={addressLog ? addressLog : ""} disabled/>
             </div>
-            <hr></hr>
+            <hr/>
+
+            <h2>Read methods</h2>
             <div>
-                <h2>Minting</h2>
-                <input type="Address" placeholder="to (address)" onChange={(e) => { setAccount(e.target.value); }} />
-                <button onClick={mint} disabled={loading}>
-                    Mint
+                <h3>Approvals</h3>
+                <input type="number" placeholder="tokenId (bignumber)" onChange={e => setTokenId(parseInt(e.target.value))}/>
+                <span>{approvalIdLog?.Address?.value}</span>
+                <button onClick={approvals}>
+                    Get approvals
                 </button>
             </div>
+
             <div>
-                <h2>Transfer</h2>
-                <input type="Address" placeholder="from (address)" onChange={e => setAccount(e.target.value.toString())} />
-                <input type="Address" placeholder="to (address)" onChange={e => setAccount1(e.target.value.toString())} />
-                <input type="number" placeholder="tokenId (bignumber)" onChange={e => setTokenId(parseInt(e.target.value))}/>
-                <button onClick={transfer} disabled={loading}>
-                    Transfer
+                <h3>Is approval for all</h3>
+                <input type="Address" placeholder="owner (address)" onChange={e => setAccount(e.target.value.toString())} />
+                <input type="Address" placeholder="operator (address)" onChange={e => setAccount1(e.target.value.toString())} />
+                <span>{approvalAllLog}</span>
+                <button onClick={isApprovalForAll}>
+                    Is approvals for all
                 </button>
             </div>
+
             <div>
-                <h2>Owner of</h2>
+                <h3>Owner of</h3>
                 <input type="number" placeholder="tokenId (bignumber)" onChange={e => setTokenId(parseInt(e.target.value))}/>
-                <span>{owner?.Address?.value}</span>
-                <button onClick={tokenOf} disabled={loading}>
+                <span>{ownerIdLog?.Address?.value}</span>
+                <button onClick={tokenOf}>
                     Owner of
                 </button>
             </div>
             <div>
-                <h2>Balance of</h2>
+                <h3>Balance of</h3>
                 <input type="Address" placeholder="owner (address)" onChange={e => setAccount(e.target.value.toString())} />
-                <span>{balance}</span>
-                <button onClick={balanceOf} disabled={loading}>
+                <span>{balanceLog}</span>
+                <button onClick={balanceOf}>
                     Balance of
+                </button>
+            </div>
+            <hr />
+
+
+            <h2>Write methods</h2>
+            <div>
+                <h3>Approve</h3>
+                <input type="Address" placeholder="spender (address)" onChange={e => setAccount(e.target.value.toString())} />
+                <input type="number" placeholder="tokenId (bignumber)" onChange={e => setTokenId(parseInt(e.target.value))}/>
+                <button onClick={approve}>
+                    Approve
+                </button>
+            </div>
+
+            <div>
+                <h3>Set approval for all</h3>
+                <input type="Address" placeholder="owner (address)" onChange={e => setAccount(e.target.value.toString())} />
+                <input type="Address" placeholder="operator (address)" onChange={e => setAccount1(e.target.value.toString())} />
+                <input type="text" placeholder="approved (bool)" onChange={e => setApproved(e.target.value.toString().toLocaleLowerCase() === "true" ? true : false)}/>
+                <button onClick={setApprovalForAll}>
+                    Approve for all
+                </button>
+            </div>
+
+            <div>
+                <h3>Minting</h3>
+                <input type="Address" placeholder="to (address)" onChange={(e) => { setAccount(e.target.value); }} />
+                <button onClick={mint}>
+                    Mint
+                </button>
+            </div>
+            <div>
+                <h3>Transfer</h3>
+                <input type="Address" placeholder="from (address)" onChange={e => setAccount(e.target.value.toString())} />
+                <input type="Address" placeholder="to (address)" onChange={e => setAccount1(e.target.value.toString())} />
+                <input type="number" placeholder="tokenId (bignumber)" onChange={e => setTokenId(parseInt(e.target.value))}/>
+                <button onClick={transfer}>
+                    Transfer
                 </button>
             </div>
         </div>

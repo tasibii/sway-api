@@ -1,7 +1,7 @@
 .playground {
     margin: 40px auto;
     text-align: left;
-    width: 500px;
+    width: 600px;
 }
 
 .playground div {
@@ -9,12 +9,17 @@
     flex-direction: column;
 }
 
+.playground div span {
+    text-align: center;
+}
+
 .playground h2 {
     display: flex;
+    margin-top: 40px;
 }
 
 .playground input {
-    width: 500px;
+    width: 593px;
     height: 40px;
     border: solid 1.5px #000;
     margin-bottom: 5px;
@@ -29,7 +34,7 @@
     border: none;
     outline: none;
     height: 45px;
-    width: 150px;
+    width: 200px;
     cursor: pointer;
-    margin: 10px 0;
+    margin: 10px 0 0 401px;
 }

@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.47.0
-  Forc version: 0.40.1
-  Fuel-Core version: 0.19.0
+  Fuels version: 0.38.1
+  Forc version: 0.35.5
+  Fuel-Core version: 0.17.3
 */
 
 import type {
@@ -24,8 +24,8 @@ import type { Option, Enum } from "./common";
 
 export type IdentityInput = Enum<{ Address: AddressInput, ContractId: ContractIdInput }>;
 export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: ContractIdOutput }>;
-export enum TokenErrorInput { DoesNotExist = 'DoesNotExist', NotOwner = 'NotOwner', NotAuthorized = 'NotAuthorized', TransferToZeroIdentity = 'TransferToZeroIdentity' };
-export enum TokenErrorOutput { DoesNotExist = 'DoesNotExist', NotOwner = 'NotOwner', NotAuthorized = 'NotAuthorized', TransferToZeroIdentity = 'TransferToZeroIdentity' };
+export type TokenErrorInput = Enum<{ DoesNotExist: [], NotOwner: [], NotAuthorized: [], TransferToZeroIdentity: [] }>;
+export type TokenErrorOutput = TokenErrorInput;
 
 export type AddressInput = { value: string };
 export type AddressOutput = AddressInput;
