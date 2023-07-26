@@ -1,0 +1,35 @@
+.playground {
+    margin: 40px auto;
+    text-align: left;
+    width: 500px;
+}
+
+.playground div {
+    display: flex;
+    flex-direction: column;
+}
+
+.playground h2 {
+    display: flex;
+}
+
+.playground input {
+    width: 500px;
+    height: 40px;
+    border: solid 1.5px #000;
+    margin-bottom: 5px;
+}
+
+.playground button {
+    border-radius: 5px;
+    background-color: #03ffc8;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, .88);
+    border: none;
+    outline: none;
+    height: 45px;
+    width: 150px;
+    cursor: pointer;
+    margin: 10px 0;
+}

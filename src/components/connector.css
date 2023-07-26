@@ -1,0 +1,41 @@
+
+.acc {
+    margin: 10px 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.acc h2 {
+    margin-block: 14px;
+}
+
+.acc span {
+    margin: auto 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    height: 80px;
+    justify-content: space-between;
+}
+
+.connector .btn {
+    border-radius: 48px;
+    background-color: #03ffc8;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, .88);
+    border: none;
+    outline: none;
+    height: 40px;
+    width: 150px;
+    cursor: pointer;
+    margin: 20px 20px;
+    position: absolute;
+    right: 0;
+}
+
+.account:hover {
+    cursor: pointer;
+}
